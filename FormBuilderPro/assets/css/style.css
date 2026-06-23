@@ -1,0 +1,297 @@
+/* ── Reset & CSS vars ──────────────────────────────────────────────── */
+#fb-app *{box-sizing:border-box}
+#fb-app{
+	font-family:system-ui,-apple-system,sans-serif;
+	color:#1a1a2e;
+	--accent:#2764e7;
+	--accent-h:#5585EC;
+	--danger:#e74c3c;
+	--success:#27ae60;
+	--border:#dde1e9;
+	--bg:#f4f6f9;
+	--panel:#fff;
+	--text:#1a1a2e;
+	--text-muted:#6b7280;
+	--radius:7px;
+	--orange:#FF6F00;
+	--orange-h:#FF8C33;
+	--green:#22C55E;
+	--green-h:#3DDD78;
+	--blue:#0284C7;
+	--blue-h:#03A5F9;
+	--gold:#CA8A04; 
+	--gold-h:#FAAB07; 
+	--red:#DC2626; 
+	--red-h:#E35252; 
+	--white:#fff; 
+}
+
+/* ── Header ────────────────────────────────────────────────────────── */
+.fb-header{
+	display:flex;align-items:center;justify-content:space-between;
+	padding:1.25rem 1.5rem;
+	background:var(--panel);
+	border-bottom:1px solid var(--border);
+	margin-bottom:1.5rem;
+	border-radius:var(--radius);
+}
+.fb-header h3{margin:0;font-size:1.25rem;font-weight:700;display:flex;align-items:center;gap:.5rem;color:var(--blue);}
+#builder-form-name{padding-left:20px;}
+
+/* ── Buttons ───────────────────────────────────────────────────────── */
+.btn{
+	display:inline-flex;align-items:center;gap:.4rem;
+	padding:.45rem 1rem;border-radius:5px;
+	font-size:.875rem;font-weight:600!important;
+	cursor:pointer;border:none;
+	text-decoration:none!important;
+	transition:background .15s,color .15s;
+}
+.btn-save{background:var(--green);color:#fff!important}
+.btn-save:hover{background:var(--green-h)}
+.btn-primary{background:var(--blue);color:#fff!important}
+.btn-primary:hover{background:var(--blue-h)}
+.btn-ghost{background-color:var(--gold);color:var(--white);}
+.btn-ghost:hover{background-color:var(--gold-h)}
+.btn-test{background:transparent;color:var(--gold);border:1px solid var(--gold)}
+.btn-test:hover{background:#eef3fd}
+.btn-edit{background-color:var(--orange);color:var(--white)!important;}
+.btn-edit:hover{background-color:var(--orange-h);}
+.btn-danger{background-color:var(--red);color:var(--white);}
+.btn-danger:hover{background-color:var(--red-h);}
+.btn-sm{padding:.3rem .7rem;font-size:.8125rem}
+.btn-icon{
+	padding:.35rem;border-radius:4px;
+	background:transparent;border:1px solid var(--border);
+	cursor:pointer;line-height:1;
+	color:var(--text-muted);text-decoration:none;
+	display:inline-flex;align-items:center;
+	transition:background .15s,color .15s;
+}
+.btn-icon:hover{background:var(--bg);color:var(--text)}
+
+/* ── Forms list table ──────────────────────────────────────────────── */
+.fb-table{
+	width:100%;border-collapse:collapse;
+	background:var(--panel);border-radius:var(--radius);
+	overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.07);
+}
+.fb-table th{
+	background:var(--bg);font-size:.8rem;font-weight:700;
+	text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);
+	padding:.6rem 1rem;text-align:left;border-bottom:1px solid var(--border);
+}
+.fb-table td{padding:.75rem 1rem;border-bottom:1px solid var(--border);vertical-align:middle;font-size:.9rem}
+.fb-table tr:last-child td{border-bottom:none}
+.fb-table tr:hover td{background:#f8f9fc}
+.fb-slug{
+	font-family:monospace;font-size:.8rem;color:var(--text-muted);
+	background:var(--bg);padding:.15rem .4rem;border-radius:3px;
+}
+.fb-empty{text-align:center;padding:3rem 1rem;color:var(--text-muted)}
+.fb-empty svg{display:block;margin:0 auto .75rem}
+
+/* ── Panel ─────────────────────────────────────────────────────────── */
+.fb-panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem}
+.fb-panel-head{
+	padding:.7rem 1rem;background:var(--bg);
+	border-bottom:1px solid var(--border);
+	font-size:.8rem;font-weight:700;
+	text-transform:uppercase;letter-spacing:.06em;color:var(--accent);
+}
+.fb-canvas{padding:.75rem;background-color: aliceblue;}
+
+/* ── Settings / Embed panels ───────────────────────────────────────── */
+.fb-settings-body{padding:.9rem}
+.fb-prop-group{margin-bottom:.9rem}
+.fb-prop-group label{
+	display:block;font-size:.8rem;font-weight:600;
+	color:var(--text-muted);margin-bottom:.3rem;
+	text-transform:uppercase;letter-spacing:.04em;
+}
+.fb-toggle{display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.875rem;font-weight:500;text-transform:none;letter-spacing:0;color:var(--text)}
+.fb-toggle input{width:auto;margin:0}
+.fb-hint{margin:.35rem 0 0;font-size:.8rem;color:var(--text-muted);line-height:1.4;font-weight:400;text-transform:none;letter-spacing:0}
+.fb-canvas .form-group input,
+.fb-prop-group input[type=text],
+.fb-prop-group input[type=email],
+.fb-prop-group select{
+	width:100%;padding:.4rem .6rem;
+	border:1px solid var(--border);border-radius:4px;
+	font-size:.875rem;background:#fff;
+}
+.fb-prop-group input:focus,.fb-prop-group select:focus{
+	outline:none;border-color:var(--accent);
+	box-shadow:0 0 0 3px rgba(39,100,231,.1);
+}
+.form-wrap.form-builder .frmb li.form-field {margin-bottom:10px;}
+.form-wrap.form-builder .frmb textarea{width:100%}
+.form-wrap.form-builder .frmb select{
+	width:auto;padding:.4rem .6rem;
+	border:1px solid var(--border);border-radius:4px;
+	font-size:.875rem;background:#fff;
+}
+
+/* ── Embed Codes ──────────────────────────────────────────────────────────── */
+#embed-shortcode,#embed-tag{color:var(--accent)}
+
+/* ── Tabs ──────────────────────────────────────────────────────────── */
+.fb-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:1rem}
+.fb-tab{
+	padding:.55rem 1rem;font-size:.875rem;font-weight:400;cursor:pointer;
+	border-bottom:2px solid transparent;margin-bottom:-1px;
+	color:var(--text-muted);transition:color .15s,border-color .15s;
+}
+.fb-tab.active{color:var(--accent);border-color:var(--accent);font-weight:600;}
+
+/* ── Toast ─────────────────────────────────────────────────────────── */
+.fb-toast{
+	position:fixed;bottom:1.5rem;right:1.5rem;
+	background:#1a1a2e;color:#fff;
+	padding:.65rem 1.1rem;border-radius:6px;
+	font-size:.875rem;font-weight:500;
+	box-shadow:0 4px 20px rgba(0,0,0,.25);
+	z-index:9999;transform:translateY(10px);opacity:0;
+	transition:all .2s;pointer-events:none;
+}
+.fb-toast.show{opacity:1;transform:none}
+.fb-toast.success{background:var(--success)}
+.fb-toast.error{background:var(--danger)}
+
+/* ── Submissions modal ─────────────────────────────────────────────── */
+.fb-modal-bg{
+	display:none;position:fixed;inset:0;
+	background:rgba(0,0,0,.4);z-index:1000;
+	align-items:center;justify-content:center;
+}
+.fb-modal-bg.open{display:flex}
+.fb-modal{
+	background:#fff;border-radius:var(--radius);
+	max-width:760px;width:90%;max-height:80vh;
+	display:flex;flex-direction:column;
+	box-shadow:0 8px 40px rgba(0,0,0,.2);
+}
+.fb-modal-head{
+	display:flex;align-items:center;justify-content:space-between;
+	padding:.9rem 1.2rem;border-bottom:1px solid var(--border);font-weight:700;
+}
+.fb-modal-body{overflow-y:auto;padding:1rem}
+.fb-sub-row{border:1px solid var(--border);border-radius:5px;margin-bottom:.6rem;padding:.65rem .9rem;font-size:.875rem}
+.fb-sub-meta{font-size:.75rem;color:var(--text-muted);margin-bottom:.35rem}
+.fb-sub-data{display:grid;grid-template-columns:auto 1fr;gap:.2rem .75rem}
+.fb-sub-data dt{font-weight:600;color:var(--text-muted)}
+
+/* ── kevinchappell/formBuilder library overrides ───────────────────── */
+/* Blend the library's UI with our colour scheme */
+#fb-canvas .frmb-control li,
+#fb-canvas .frmb li.field-actions .btn{
+	border-radius:5px;margin-bottom:5px;border:solid 1px var(--accent-h)!important;color:var(--accent);
+}
+#fb-canvas .frmb-control li:hover{
+	background:#eef3fd;border-color:var(--accent);
+}
+#fb-canvas .frmb li.ui-sortable-handle:hover{
+	border-color:var(--accent);
+	box-shadow:0 2px 8px rgba(39,100,231,.1);
+}
+/* Accent the "add field" buttons */
+#fb-canvas .frmb-control li a{
+	color:var(--text);
+}
+/* Edit/delete action buttons inside a field card */
+#fb-canvas .field-actions .btn-default{
+	background:transparent;border:1px solid var(--border);color:var(--text-muted);
+}
+#fb-canvas .field-actions .btn-default:hover{
+	background:var(--bg);color:var(--text);
+}
+#fb-canvas .field-actions .delete-confirm{
+	color:var(--danger);border-color:var(--danger);
+}
+#fb-canvas .frmb-control li span{font-size:1.2em}
+
+/* ── Responsive ────────────────────────────────────────────────────── */
+@media(max-width:900px){.fb-builder-wrap{grid-template-columns:1fr}}
+/* ── Canvas field-specific fixes ────────────────────────────────────── */
+/* GS admin CSS stomps on inputs/labels inside the canvas — undo it	*/
+
+/* Radio & checkbox option rows */
+.form-wrap.form-builder .frmb .sortable-options li {
+	display:flex;align-items:center;gap:.4rem;
+	padding:.2rem 0;list-style:none;
+	background:none;border:none;margin:0;
+}
+.form-wrap.form-builder .frmb .sortable-options {
+	padding:0;margin:.4rem 0 0;list-style:none;
+}
+div.input-wrap input[type=checkbox]{width:auto;}
+/* Option inputs (radio/checkbox controls inside canvas) */
+.form-wrap.form-builder .frmb .sortable-options input[type=radio],
+.form-wrap.form-builder .frmb .sortable-options input[type=checkbox] {
+	width:auto!important;
+	height:auto!important;
+	margin:0;
+	flex-shrink:0;
+}
+/* Option text inputs */
+.form-wrap.form-builder .frmb .sortable-options input[type=text] {
+	width:auto;flex:1;
+	padding:.2rem .4rem;
+	border:1px solid var(--border);border-radius:4px;
+	font-size:.8125rem;background:#fff;
+}
+/* Option labels */
+div.formbuilder-header.form-group h1,h2,h3,h4,h5,h6{color:#1a1a2e;!important;font-weight:600;}
+.form-wrap.form-builder .frmb .sortable-options label {
+	display:inline-flex;align-items:center;gap:.35rem;
+	font-size:.8125rem;font-weight:400;
+	color:var(--text);margin:0;
+	text-transform:none;letter-spacing:0;
+	cursor:pointer;
+}
+/* File upload input */
+.form-wrap.form-builder .frmb input[type=file] {
+	width:auto!important;
+	padding:.3rem 0;
+	border:none;background:none;
+	font-size:.875rem;
+}
+/* Field labels inside canvas */
+.form-wrap.form-builder .frmb .field-label {
+	font-weight:400;font-size:.875rem;color:var(--text);
+	display:inline;
+}
+/* Preview area for radio/checkbox groups */
+.form-wrap.form-builder .frmb .prev-holder {
+	margin-top:.4rem;
+	padding:.4rem .6rem;
+	background:var(--bg);border-radius:4px;border:1px solid var(--border);
+	font-size:.875rem;
+}
+.form-wrap.form-builder .frmb .prev-holder input[type=radio],
+.form-wrap.form-builder .frmb .prev-holder input[type=checkbox] {
+	width:20px!important;height:20px!important;margin-right:.3rem;
+}
+.form-wrap.form-builder .frmb .prev-holder label {
+	display:inline-flex;align-items:center;
+	font-weight:400;margin-right:.75rem;
+	text-transform:none;letter-spacing:0;
+	color:var(--text);font-size:.875rem;cursor:default;
+}
+/* Option delete button */
+.form-wrap.form-builder .frmb .sortable-options .remove {
+	padding:.1rem .4rem;font-size:.75rem;
+	color:var(--danger);background:none;border:1px solid var(--danger);
+	border-radius:3px;cursor:pointer;flex-shrink:0;
+	line-height:1.4;
+}
+/* Add option button */
+.form-wrap.form-builder .frmb .add-opt {
+	margin-top:.4rem;font-size:.8125rem;
+	color:var(--accent);background:none;
+	border:1px dashed var(--accent);
+	border-radius:4px;padding:.25rem .6rem;cursor:pointer;
+}
+.form-wrap.form-builder .frmb .add-opt:hover {
+	background:#eef3fd;
+}
