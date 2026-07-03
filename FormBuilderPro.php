@@ -5,7 +5,7 @@ Plugin Name: Form Builder Pro
 Description: Drag-n-drop form builder with mail() and SMTP. (SQLite3 required)
 Version: 1.0
 Author: risingisland
-Author URI: https://getsimple-ce.ovh/donate
+Author URI: https://ko-fi.com/ericmontgomery
 */
 
 i18n_merge('FormBuilderPro') || i18n_merge('FormBuilderPro', 'en_US');
@@ -23,7 +23,7 @@ register_plugin(
 	'Form Builder Pro',
 	'1.0',
 	'risingisland',
-	'https://getsimple-ce.ovh/donate',
+	'https://ko-fi.com/ericmontgomery',
 	'Drag-n-drop form builder with mail() and SMTP. (SQLite3 required)',
 	'theme',
 	'FormBuilderPro_admin_page'
