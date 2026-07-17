@@ -53,8 +53,8 @@
 .btn-primary:hover{background:var(--blue-h)}
 .btn-ghost{background-color:var(--gold);color:var(--white);}
 .btn-ghost:hover{background-color:var(--gold-h)}
-.btn-test{background:transparent;color:var(--gold);border:1px solid var(--gold)}
-.btn-test:hover{background:#eef3fd}
+.btn-test{background:#666;color:#fff;border:1px solid #666}
+.btn-test:hover{background:#999}
 .btn-edit{background-color:var(--orange);color:var(--white)!important;}
 .btn-edit:hover{background-color:var(--orange-h);}
 .btn-danger{background-color:var(--red);color:var(--white);}

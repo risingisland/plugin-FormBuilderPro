@@ -1083,6 +1083,34 @@ function FormBuilderPro_handle_ajax($action) {
 			exit;
 		}
 
+		case 'duplicate_form': {
+			$id   = (int)($_POST['id'] ?? 0);
+			$form = FormBuilderPro_get_form($id);
+			if (!$form) { echo json_encode(['ok' => false, 'msg' => 'Form not found']); exit; }
+
+			$new_name = 'Copy of ' . $form['name'];
+			$new_slug = FormBuilderPro_unique_slug($new_name);
+
+			$db   = FormBuilderPro_db();
+			$stmt = $db->prepare("INSERT INTO fbp_forms (name, slug, fields, settings) VALUES (:n, :s, :f, :st)");
+			$stmt->bindValue(':n',  $new_name,       SQLITE3_TEXT);
+			$stmt->bindValue(':s',  $new_slug,        SQLITE3_TEXT);
+			$stmt->bindValue(':f',  $form['fields'],  SQLITE3_TEXT);
+			$stmt->bindValue(':st', $form['settings'], SQLITE3_TEXT);
+			$stmt->execute();
+			$new_id = $db->lastInsertRowID();
+
+			echo json_encode([
+				'ok'      => true,
+				'id'      => $new_id,
+				'name'    => $new_name,
+				'slug'    => $new_slug,
+				'fields'  => count(json_decode($form['fields'], true) ?: []),
+				'created' => date('d M Y'),
+			]);
+			exit;
+		}
+
 		case 'delete_form': {
 			$id   = (int)($_POST['id'] ?? 0);
 			$db   = FormBuilderPro_db();

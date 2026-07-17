@@ -81,7 +81,11 @@ const FB_DOWNLOAD_BASE = '<?= $SITEURL ?>plugins/FormBuilderPro/public/download.
                 <svg width="1em" height="1em" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><g fill="currentColor"><path d="M8 7a1 1 0 0 1-1 1H6a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-1a1 1 0 0 1 2 0v1a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3h1a1 1 0 0 1 1 1"/><path d="m14.596 5.011l4.392 4.392l-6.28 6.303A1 1 0 0 1 12 16H9a1 1 0 0 1-1-1v-3a1 1 0 0 1 .294-.708zm6.496-2.103a3.097 3.097 0 0 1 .165 4.203l-.164.18l-.693.694l-4.387-4.387l.695-.69a3.1 3.1 0 0 1 4.384 0"/></g></svg>
 				<?= i18n_r('FormBuilderPro/lang_Edit') ?>
             </a>
-            <button class="btn btn-ghost btn-sm" onclick="fbViewSubmissions(<?= $f['id'] ?>, <?= htmlspecialchars(json_encode($f['name'])) ?>)">
+            <button class="btn btn-ghost btn-sm" onclick="fbDuplicateForm(<?= $f['id'] ?>, <?= htmlspecialchars(json_encode($f['name'])) ?>)">
+                <svg width="1em" height="1em" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2m0 16H8V7h11z" fill="currentColor"/></svg>
+				<?= i18n_r('FormBuilderPro/lang_Duplicate') ?>
+            </button>
+            <button class="btn btn-test btn-sm" onclick="fbViewSubmissions(<?= $f['id'] ?>, <?= htmlspecialchars(json_encode($f['name'])) ?>)">
                 <svg width="1em" height="1em" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 .64L8.23 3H5v2L2.97 6.29C2.39 6.64 2 7.27 2 8v10a2 2 0 0 0 2 2h16c1.11 0 2-.89 2-2V8c0-.73-.39-1.36-.97-1.71L19 5V3h-3.23M7 5h10v4.88L12 13L7 9.88M8 6v1.5h8V6M5 7.38v1.25L4 8m15-.62L20 8l-1 .63M8 8.5V10h8V8.5Z" fill="currentColor"/></svg>
 				<?= i18n_r('FormBuilderPro/lang_Submissions') ?>
             </button>
@@ -115,6 +119,56 @@ function fbToast(msg, type) {
     t.textContent = msg;
     t.className = 'fb-toast ' + (type || '') + ' show';
     setTimeout(() => t.className = 'fb-toast', 2500);
+}
+
+function fbDuplicateForm(id, name) {
+    if (!confirm('Duplicate "' + name + '"?')) return;
+    fetch('?id=FormBuilderPro', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'fb_action=duplicate_form&id=' + id
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d && d.ok) {
+            // Insert new row at top of table body
+            const tbody = document.querySelector('.fb-table tbody');
+            if (tbody) {
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td><strong>${escH(d.name)}</strong></td>
+                    <td><span class="fb-slug">${escH(d.slug)}</span></td>
+                    <td>${d.fields}</td>
+                    <td>${escH(d.created)}</td>
+                    <td style="text-align:right;white-space:nowrap">
+                        <a class="btn btn-edit btn-sm" href="?id=FormBuilderPro&fb_view=edit&form_id=${d.id}">
+                            <svg width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><g fill="currentColor"><path d="M8 7a1 1 0 0 1-1 1H6a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-1a1 1 0 0 1 2 0v1a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3h1a1 1 0 0 1 1 1"/><path d="m14.596 5.011 4.392 4.392-6.28 6.303A1 1 0 0 1 12 16H9a1 1 0 0 1-1-1v-3a1 1 0 0 1 .294-.708zm6.496-2.103a3.097 3.097 0 0 1 .165 4.203l-.164.18-.693.694-4.387-4.387.695-.69a3.1 3.1 0 0 1 4.384 0"/></g></svg>
+                            Edit
+                        </a>
+                        <button class="btn btn-ghost btn-sm" onclick="fbDuplicateForm(${d.id}, ${JSON.stringify(d.name)})">
+                            <svg width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2m0 16H8V7h11z" fill="currentColor"/></svg>
+                            Duplicate
+                        </button>
+                        <button class="btn btn-ghost btn-sm" onclick="fbViewSubmissions(${d.id}, ${JSON.stringify(d.name)})">
+                            Submissions
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="fbDeleteForm(${d.id}, ${JSON.stringify(d.name)})">
+                            <svg width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 4h-3.5l-1-1h-5l-1 1H5v2h14M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6z" fill="currentColor"/></svg>
+                            Delete
+                        </button>
+                    </td>`;
+                tbody.insertBefore(newRow, tbody.firstChild);
+                // Highlight briefly
+                newRow.style.background = '#eef3fd';
+                setTimeout(() => newRow.style.transition = 'background 1s', 50);
+                setTimeout(() => newRow.style.background = '', 1000);
+            }
+            fbToast('Form duplicated');
+        } else {
+            fbToast('Duplicate failed', 'error');
+        }
+    })
+    .catch(() => fbToast('Duplicate failed', 'error'));
 }
 
 function fbDeleteForm(id, name) {

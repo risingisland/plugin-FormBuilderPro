@@ -11,6 +11,7 @@ $i18n = [
     'lang_New_Form'                     => 'New Form',
     'lang_Save'                         => 'Save',
     'lang_Edit'                         => 'Edit Form',
+    'lang_Duplicate'                    => 'Duplicate',
     'lang_Delete'                       => 'Delete',
     'lang_Back'                         => 'Back to list',
     'lang_Submissions'                  => 'Submissions',

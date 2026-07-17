@@ -11,6 +11,7 @@ $i18n = [
     'lang_New_Form'                     => 'Nowy formularz',
     'lang_Save'                         => 'Zapisz',
     'lang_Edit'                         => 'Edytuj formularz',
+    'lang_Duplicate'                    => 'Kopiować',
     'lang_Delete'                       => 'Usuń',
     'lang_Back'                         => 'Powrót do listy',
     'lang_Submissions'                  => 'Zgłoszenia',
