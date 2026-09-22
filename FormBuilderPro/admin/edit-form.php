@@ -3,10 +3,6 @@
 /**
  * Form Builder Pro — Admin: Edit / New Form
  * Included by FormBuilderPro_admin_page() when fb_view is 'edit'.
- *
- * URL params:
- *   ?id=FormBuilderPro&fb_view=edit              → new form
- *   ?id=FormBuilderPro&fb_view=edit&form_id=N    → edit existing form
  */
 
 $edit_id   = (int)($_GET['form_id'] ?? 0);
@@ -16,12 +12,13 @@ $js_form_id   = $edit_id;
 $js_form_name = $edit_form ? htmlspecialchars($edit_form['name'], ENT_QUOTES) : '';
 $js_fields    = $edit_form ? $edit_form['fields']   : '[]';
 $js_settings  = $edit_form ? $edit_form['settings'] : '{}';
+$fb_nonce     = FormBuilderPro_get_token_nonce();
 ?>
 <!-- ── Styles ───────────────────────────────────────────────────────────── -->
 <link rel="stylesheet" href="<?= FormBuilderPro_PLUGIN_URL ?>assets/css/jquery-ui.min.css">
 <link rel="stylesheet" href="<?= FormBuilderPro_PLUGIN_URL ?>assets/css/style.css">
 
-<div id="fb-app">
+<div id="fb-app" data-nonce="<?= htmlspecialchars($fb_nonce) ?>">
 
 <!-- Toast -->
 <div class="fb-toast" id="fb-toast"></div>
@@ -29,7 +26,7 @@ $js_settings  = $edit_form ? $edit_form['settings'] : '{}';
 <!-- ── Header ───────────────────────────────────────────────────────────── -->
 <div class="fb-header">
     <h3>
-        <a style="color:var(--gold);border:1px solid var(--gold)" class="btn-icon" href="?id=FormBuilderPro" title="<?= i18n_r('FormBuilderPro/lang_Back') ?>">
+        <a style="color:var(--gold);border:1px solid var(--gold)" class="btn-icon" href="load.php?id=FormBuilderPro" title="<?= i18n_r('FormBuilderPro/lang_Back') ?>">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8l4 4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
         <span id="builder-form-name"><?= i18n_r('FormBuilderPro/lang_Edit') ?>: <span style="color:grey"><?= $js_form_name ?: i18n_r('FormBuilderPro/lang_New_Form') ?></span></span>
@@ -50,19 +47,20 @@ $js_settings  = $edit_form ? $edit_form['settings'] : '{}';
 		<svg xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle" width="1.2em" height="1.2em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none" /><path fill="currentColor" d="M19 2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 4V4H5v2zm0 10a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2zm0 4v-2H5v2zm0-11a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2zm0 4v-2H5v2z" /></svg>
 		<?= i18n_r('FormBuilderPro/lang_Tab_Fields') ?>
 	</div>
-    <div class="fb-tab" data-tab="settings" onclick="fbSwitchTab('settings')">
+	<div class="fb-tab" data-tab="settings" onclick="fbSwitchTab('settings')">
 		<svg xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle" width="1.2em" height="1.2em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none" /><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707l.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707l-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707l-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535l1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.708l.536.536a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536l.707-1.707H20a1 1 0 0 0 1-1" /><path d="M12 15a3 3 0 1 0 0-6a3 3 0 0 0 0 6" /></g></svg> 
 		<?= i18n_r('FormBuilderPro/lang_Tab_Settings') ?>
-		</div>
-    <div class="fb-tab" data-tab="spam" onclick="fbSwitchTab('spam')">
-		<svg xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle" width="1.2em" height="1.2em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none" /><path fill="currentColor" d="M12 22q-3.475-.875-5.738-3.988T4 11.1V5l8-3l8 3v6.1q0 3.8-2.262 6.913T12 22m0-2.1q2.425-.75 4.05-2.963T17.95 12H12V4.125l-6 2.25v5.175q0 .175.05.45H12z" /></svg> 
-		<?= i18n_r('FormBuilderPro/lang_Tab_Spam') ?></div>
-    <div class="fb-tab" data-tab="embed" onclick="fbSwitchTab('embed')">
-		<svg xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle" width="1.2em" height="1.2em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none" /><path fill="currentColor" d="m12.89 3l1.96.4L11.11 21l-1.96-.4zm6.7 9L16 8.41V5.58L22.42 12L16 18.41v-2.83zM1.58 12L8 5.58v2.83L4.41 12L8 15.58v2.83z" /></svg> 
-		<?= i18n_r('FormBuilderPro/lang_Tab_Embed') ?></div>
 	</div>
+	<div class="fb-tab" data-tab="spam" onclick="fbSwitchTab('spam')">
+		<svg xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle" width="1.2em" height="1.2em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none" /><path fill="currentColor" d="M12 22q-3.475-.875-5.738-3.988T4 11.1V5l8-3l8 3v6.1q0 3.8-2.262 6.913T12 22m0-2.1q2.425-.75 4.05-2.963T17.95 12H12V4.125l-6 2.25v5.175q0 .175.05.45H12z" /></svg> 
+		<?= i18n_r('FormBuilderPro/lang_Tab_Spam') ?>
+	</div>
+	<div class="fb-tab" data-tab="embed" onclick="fbSwitchTab('embed')">
+		<svg xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle" width="1.2em" height="1.2em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none" /><path fill="currentColor" d="m12.89 3l1.96.4L11.11 21l-1.96-.4zm6.7 9L16 8.41V5.58L22.42 12L16 18.41v-2.83zM1.58 12L8 5.58v2.83L4.41 12L8 15.58v2.83z" /></svg> 
+		<?= i18n_r('FormBuilderPro/lang_Tab_Embed') ?>
+	</div>
+</div>
 
-<!-- ── Tab: Fields ──────────────────────────────────────────────────────── -->
 <div id="tab-fields">
     <div class="fb-panel">
         <div class="fb-panel-head"><?= i18n_r('FormBuilderPro/lang_Canvas_Head') ?></div>
@@ -344,6 +342,7 @@ const FB_FIELDS    = <?= $js_fields ?>;
 const FB_SETTINGS  = <?= $js_settings ?>;
 const FB_LOCALE    = <?= json_encode($fb_locale ?? 'en-US') ?>;
 const FB_PLUGIN_URL = <?= json_encode(FormBuilderPro_PLUGIN_URL) ?>;
+const FB_NONCE     = <?= json_encode($fb_nonce) ?>;
 
 const FB_I18N = {
     saveFirst:    <?= json_encode(i18n_r('FormBuilderPro/lang_Save_First'))    ?>,

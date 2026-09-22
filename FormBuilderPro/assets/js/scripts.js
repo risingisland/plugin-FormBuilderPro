@@ -6,7 +6,7 @@
  *   jQuery 3.x, jQuery UI, form-builder.min.js
  *
  * Seed globals injected by edit-form.php:
- *   FB_FORM_ID, FB_FORM_NAME, FB_FIELDS, FB_SETTINGS, FB_I18N
+ *   FB_FORM_ID, FB_FORM_NAME, FB_FIELDS, FB_SETTINGS, FB_I18N, FB_NONCE
  */
 
 $(function () {
@@ -80,27 +80,20 @@ $(function () {
 	}
 
 	// Our storage format → formBuilder library format
-	// Since we now store the full library object, pass it straight through.
-	// Strip our custom properties first so the library doesn't choke on them.
 	function fbFieldsToLibFormat(fields) {
 		if (!fields || !fields.length) return null;
 		return fields.map(f => {
-			// Remove our custom keys before handing back to library
 			const { reply_to, allowed_types, max_size, ...libField } = f;
 			return libField;
 		});
 	}
 
 	// Library JS array → our storage format
-	// We store the full library object to preserve all field properties,
-	// then layer our custom state (reply_to, file options) on top.
 	function libFieldsToOurFormat(libFields) {
 		if (!Array.isArray(libFields)) return [];
 		return libFields.map(f => {
 			const name = f.name || fbSlugify(f.label || f.type);
-			// Start with the full library object so nothing is discarded
 			const out = Object.assign({}, f, { name });
-			// Layer our custom state on top
 			out.reply_to = !!replyToState[name];
 			if (f.type === 'file') {
 				out.allowed_types = fileState[name]?.allowed_types ?? 'pdf,doc,docx,xls,xlsx,jpg,jpeg,png,gif,zip';
@@ -110,13 +103,11 @@ $(function () {
 		});
 	}
 
-	// Get current fields from the library as a JS array
 	function getLibFields() {
 		if (!fbInstance) return [];
 		try {
 			const data = fbInstance.actions.getData();
 			if (Array.isArray(data)) return data;
-			// Older versions may return JSON string
 			const parsed = JSON.parse(data);
 			return Array.isArray(parsed) ? parsed : [];
 		} catch(e) {
@@ -283,9 +274,10 @@ $(function () {
 		const ourFields = libFieldsToOurFormat(libFields);
 		const settings  = readSettings();
 		const formId	= window.fbSavedId || FB_FORM_ID;
+		const nonce     = typeof FB_NONCE !== 'undefined' ? FB_NONCE : ($('#fb-app').data('nonce') || '');
 
 		$.ajax({
-			url:	  '?id=FormBuilderPro',
+			url:	  'load.php?id=FormBuilderPro',
 			method:   'POST',
 			dataType: 'json',
 			data: {
@@ -294,6 +286,7 @@ $(function () {
 				name:	  name,
 				fields:	JSON.stringify(ourFields),
 				settings:  JSON.stringify(settings),
+				fb_nonce:  nonce,
 			},
 			success: function (d) {
 				if (d && d.ok) {
@@ -304,7 +297,7 @@ $(function () {
 					updateEmbed();
 					fbRenderReplyToPanel();
 					fbRenderFilePanel();
-					history.replaceState(null, '', '?id=FormBuilderPro&fb_view=edit&form_id=' + d.id);
+					history.replaceState(null, '', 'load.php?id=FormBuilderPro&fb_view=edit&form_id=' + d.id);
 				} else {
 					fbToast((d && d.msg) || FB_I18N.saveFailed, 'error');
 				}
@@ -318,16 +311,21 @@ $(function () {
 		const settings = readSettings();
 		const resultEl = document.getElementById('fb-test-result');
 		const btn	  = document.querySelector('button[onclick="fbTestEmail()"]');
+		const nonce    = typeof FB_NONCE !== 'undefined' ? FB_NONCE : ($('#fb-app').data('nonce') || '');
 
 		resultEl.style.color = 'var(--text-muted)';
 		resultEl.textContent = FB_I18N.testSending;
 		btn.disabled = true;
 
 		$.ajax({
-			url:	  '?id=FormBuilderPro',
+			url:	  'load.php?id=FormBuilderPro',
 			method:   'POST',
 			dataType: 'json',
-			data: { fb_action: 'test_email', settings: JSON.stringify(settings) },
+			data: {
+				fb_action: 'test_email',
+				settings:  JSON.stringify(settings),
+				fb_nonce:  nonce,
+			},
 			success: function (d) {
 				if (d && d.ok) {
 					resultEl.style.color = 'var(--success)';

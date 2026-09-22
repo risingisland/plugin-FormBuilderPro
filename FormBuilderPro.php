@@ -3,7 +3,7 @@
 /*
 Plugin Name: Form Builder Pro
 Description: Drag-n-drop form builder with mail() and SMTP. (SQLite3 required)
-Version: 1.0
+Version: 1.1
 Author: risingisland
 Author URI: https://ko-fi.com/ericmontgomery
 */
@@ -11,17 +11,18 @@ Author URI: https://ko-fi.com/ericmontgomery
 i18n_merge('FormBuilderPro') || i18n_merge('FormBuilderPro', 'en_US');
 
 // ─── Constants ───────────────────────────────────────────────────────────────
-define('FormBuilderPro_DB_PATH',	 GSDATAOTHERPATH . 'FormBuilderPro.db');
-define('FormBuilderPro_SLUG',		basename(__FILE__, '.php'));
-define('FormBuilderPro_PLUGIN_DIR',  GSPLUGINPATH	. FormBuilderPro_SLUG . '/');
+define('FormBuilderPro_DB_PATH',     GSDATAOTHERPATH . 'FormBuilderPro.db');
+define('FormBuilderPro_SLUG',        basename(__FILE__, '.php'));
+define('FormBuilderPro_PLUGIN_DIR',  GSPLUGINPATH    . FormBuilderPro_SLUG . '/');
 define('FormBuilderPro_PLUGIN_URL',  $SITEURL . 'plugins/' . FormBuilderPro_SLUG . '/');
+define('FormBuilderPro_UPLOAD_DIR',  GSDATAOTHERPATH . 'fbp_uploads/');
 
 // ─── Bootstrap ───────────────────────────────────────────────────────────────
 
 register_plugin(
 	FormBuilderPro_SLUG,
 	'Form Builder Pro',
-	'1.0',
+	'1.1',
 	'risingisland',
 	'https://ko-fi.com/ericmontgomery',
 	'Drag-n-drop form builder with mail() and SMTP. (SQLite3 required)',
@@ -31,29 +32,25 @@ register_plugin(
 
 add_action('theme-sidebar', 'createSideMenu', array(
 	FormBuilderPro_SLUG,
-	i18n_r('FormBuilderPro/lang_Menu_Title') . ' <svg xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;" width="22" height="22" viewBox="0 0 28 28"><path d="M0 0h28v28H0z" fill="none"/><g fill="none"><path fill="url(#SVGErK8BdUl)" d="M6.75 3A3.75 3.75 0 0 0 3 6.75v14.5A3.75 3.75 0 0 0 6.75 25h14.5A3.75 3.75 0 0 0 25 21.25V6.75A3.75 3.75 0 0 0 21.25 3z"/><path fill="url(#SVGkRQBvetf)" d="M6 12.5a2.5 2.5 0 1 1 5 0a2.5 2.5 0 0 1-5 0M8.5 17a2.5 2.5 0 1 0 0 5a2.5 2.5 0 0 0 0-5m4.5-4.75a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1-.75-.75m.75 6.25a.75.75 0 0 0 0 1.5h7.5a.75.75 0 0 0 0-1.5zM6 7.25a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H6.75A.75.75 0 0 1 6 7.25"/><defs><linearGradient id="SVGErK8BdUl" x1="10.857" x2="19.286" y1="3" y2="23.814" gradientUnits="userSpaceOnUse"><stop stop-color="#b3e0ff"/><stop offset="1" stop-color="#8cd0ff"/></linearGradient><linearGradient id="SVGkRQBvetf" x1="5.2" x2="24.614" y1="5.725" y2="9.282" gradientUnits="userSpaceOnUse"><stop stop-color="#0094f0"/><stop offset="1" stop-color="#2764e7"/></linearGradient></defs></g></svg>'
+	i18n_r('FormBuilderPro/lang_Menu_Title') . ' <svg xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;" width="22" height="22" viewBox="0 0 28 28"><path d="M0 0h28v28H0z" fill="none"/><g fill="none"><path fill="url(#SVGErK8BdUl)" d="M6.75 3A3.75 3.75 0 0 0 3 6.75v14.5A3.75 3.75 0 0 0 6.75 25h14.5A3.75 3.75 0 0 0 25 21.25V6.75A3.75 3.75 0 0 0 21.25 3z"/><path fill="url(#SVGkRQBvetf)" d="M6 12.5a2.5 2.5 0 1 1 5 0a2.5 2.5 0 0 1-5 0M8.5 17a2.5 2.5 0 1 0 0 5a2.5 2.5 0 0 0 0-5m4.5-4.75a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1-.75-.75m.75 6.25a.75.75 0 0 0 0 1.5h7.5a.75.75 0 0 0 0-1.5zM6 7.25a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H6.75A.75.75 0 0 1 6 7.25"/><defs><linearGradient id="SVGErK8BdUl" x1="10.857" x2="19.286" y1="3" y2="23.814" gradientUnits="userSpaceOnUse"><stop stop-color="#b3e0ff"/><stop offset="1" stop-color="#8cd0ff"/></linearGradient><linearGradient id="SVGkRQBvetf" x1="5.2" x2="24.614" y1="5.725" y2="9.282" gradientUnits="userSpaceOnUse"><stop stop-color="#0094f0"/><stop offset="1" stop-color="#2764e7"/></linearGradient></defs></g></svg>',
+	'?id=' . FormBuilderPro_SLUG
 ));
 
 FormBuilderPro_init_db();
 
 // ── Early AJAX intercept ──────────────────────────────────────────────────────
-// Must run before GS outputs any HTML. Only fires when:
-//   (a) we are on the FormBuilderPro admin page (?id=FormBuilderPro), AND
-//   (b) an fb_action param is present
 if (
 	!empty($_REQUEST['fb_action']) &&
 	isset($_GET['id']) && $_GET['id'] === FormBuilderPro_SLUG
 ) {
 	FormBuilderPro_handle_ajax($_REQUEST['fb_action']);
-	// FormBuilderPro_handle_ajax() always exit()s - this is a safety net:
 	exit;
 }
 
-// Process front-end form submissions before any output
 add_action('index-pretemplate', 'FormBuilderPro_process_submission');
 
 // ─────────────────────────────────────────────────────────────────────────────
-// DATABASE
+// DATABASE & AUTH
 // ─────────────────────────────────────────────────────────────────────────────
 
 function FormBuilderPro_db() {
@@ -96,14 +93,54 @@ function FormBuilderPro_init_db() {
 		);
 	");
 
-	// Ensure upload directory exists and is protected from direct HTTP access
-	$upload_dir = GSDATAOTHERPATH . 'fbp_uploads/';
-	if (!is_dir($upload_dir)) {
-		mkdir($upload_dir, 0755, true);
+	if (!is_dir(FormBuilderPro_UPLOAD_DIR)) {
+		@mkdir(FormBuilderPro_UPLOAD_DIR, 0755, true);
 	}
-	$htaccess = $upload_dir . '.htaccess';
+	$htaccess = FormBuilderPro_UPLOAD_DIR . '.htaccess';
 	if (!file_exists($htaccess)) {
-		file_put_contents($htaccess, "Require all denied\n");
+		@file_put_contents($htaccess, "Deny from all\n");
+	}
+}
+
+function FormBuilderPro_get_token_nonce() {
+	if (function_exists('get_nonce')) {
+		return get_nonce('fbp_admin_action', 'fbp');
+	}
+	if (function_exists('create_nonce')) {
+		return create_nonce('fbp_admin_action', 'fbp');
+	}
+	return 'fbp_nonce';
+}
+
+function FormBuilderPro_check_auth_or_die() {
+	if (!function_exists('cookie_check') && defined('GSADMININCPATH') && file_exists(GSADMININCPATH . 'inc/cookie_functions.php')) {
+		require_once(GSADMININCPATH . 'inc/cookie_functions.php');
+	}
+
+	$is_admin = function_exists('cookie_check') ? cookie_check() : false;
+	if (!$is_admin) {
+		header('Content-Type: application/json; charset=utf-8');
+		http_response_code(403);
+		echo json_encode(['ok' => false, 'msg' => 'Access denied: please log in.']);
+		exit;
+	}
+
+	$nonce = $_POST['fb_nonce'] ?? $_GET['fb_nonce'] ?? '';
+	$valid_nonce = false;
+
+	if (function_exists('check_nonce') && !empty($nonce)) {
+		try {
+			$valid_nonce = check_nonce($nonce, 'fbp_admin_action', 'fbp')
+			            || check_nonce($nonce, 'fbp_admin_action')
+			            || check_nonce($nonce, 'load.php?id=' . FormBuilderPro_SLUG);
+		} catch (\Throwable $e) {}
+	}
+
+	if (!$valid_nonce && !$is_admin) {
+		header('Content-Type: application/json; charset=utf-8');
+		http_response_code(403);
+		echo json_encode(['ok' => false, 'msg' => 'Security check failed. Please reload.']);
+		exit;
 	}
 }
 
@@ -168,7 +205,7 @@ function FormBuilderPro_get_form_by_slug($slug) {
 
 function FormBuilderPro_slugify($str) {
 	$str = strtolower(trim($str));
-	$str = preg_replace('/[^a-z0-9]+/', '-', $str);
+	$str = preg_replace('/[^a-z0-9\-]+/', '-', $str);
 	return trim($str, '-');
 }
 
@@ -189,7 +226,7 @@ function FormBuilderPro_unique_slug($name, $exclude_id = 0) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// FORM SUBMISSION HANDLER  (front-end, hooked to 'index')
+// FORM SUBMISSION HANDLER (FRONT-END)
 // ─────────────────────────────────────────────────────────────────────────────
 
 function FormBuilderPro_process_submission() {
@@ -219,9 +256,9 @@ function FormBuilderPro_process_submission() {
 	if (!empty($settings['turnstile_secret_key']) && ($settings['captcha_method'] ?? '') === 'turnstile') {
 		$token = $_POST['cf-turnstile-response'] ?? '';
 		if (!FormBuilderPro_verify_turnstile($settings['turnstile_secret_key'], $token)) {
-			if (session_status() === PHP_SESSION_NONE) session_start();
+			if (session_status() === PHP_SESSION_NONE) @session_start();
 			$_SESSION['fb_errors_' . $form_id] = [i18n_r('FormBuilderPro/lang_Turnstile_Failed')];
-			session_write_close();
+			@session_write_close();
 			FormBuilderPro_redirect_result($form_id, 'err');
 			return;
 		}
@@ -229,9 +266,9 @@ function FormBuilderPro_process_submission() {
 	if (!empty($settings['hcaptcha_secret_key']) && ($settings['captcha_method'] ?? '') === 'hcaptcha') {
 		$token = $_POST['h-captcha-response'] ?? '';
 		if (!FormBuilderPro_verify_hcaptcha($settings['hcaptcha_secret_key'], $token)) {
-			if (session_status() === PHP_SESSION_NONE) session_start();
+			if (session_status() === PHP_SESSION_NONE) @session_start();
 			$_SESSION['fb_errors_' . $form_id] = [i18n_r('FormBuilderPro/lang_HCaptcha_Failed')];
-			session_write_close();
+			@session_write_close();
 			FormBuilderPro_redirect_result($form_id, 'err');
 			return;
 		}
@@ -239,9 +276,9 @@ function FormBuilderPro_process_submission() {
 	if (!empty($settings['recaptcha2_secret_key']) && ($settings['captcha_method'] ?? '') === 'recaptcha2') {
 		$token = $_POST['g-recaptcha-response'] ?? '';
 		if (!FormBuilderPro_verify_recaptcha($settings['recaptcha2_secret_key'], $token)) {
-			if (session_status() === PHP_SESSION_NONE) session_start();
+			if (session_status() === PHP_SESSION_NONE) @session_start();
 			$_SESSION['fb_errors_' . $form_id] = [i18n_r('FormBuilderPro/lang_Recaptcha_Failed')];
-			session_write_close();
+			@session_write_close();
 			FormBuilderPro_redirect_result($form_id, 'err');
 			return;
 		}
@@ -250,9 +287,9 @@ function FormBuilderPro_process_submission() {
 		$token	 = $_POST['_fb_recaptcha3_token'] ?? '';
 		$threshold = (float)($settings['recaptcha3_threshold'] ?? 0.5);
 		if (!FormBuilderPro_verify_recaptcha3($settings['recaptcha3_secret_key'], $token, $threshold)) {
-			if (session_status() === PHP_SESSION_NONE) session_start();
+			if (session_status() === PHP_SESSION_NONE) @session_start();
 			$_SESSION['fb_errors_' . $form_id] = [i18n_r('FormBuilderPro/lang_Recaptcha_Failed')];
-			session_write_close();
+			@session_write_close();
 			FormBuilderPro_redirect_result($form_id, 'err');
 			return;
 		}
@@ -273,25 +310,26 @@ function FormBuilderPro_process_submission() {
 
 		if ($type === 'file') {
 			if (!empty($_FILES[$name]['name'])) {
-				$upload_dir    = GSDATAOTHERPATH . 'fbp_uploads/';
+				$upload_dir    = FormBuilderPro_UPLOAD_DIR;
 				$original      = basename($_FILES[$name]['name']);
 				$ext           = strtolower(pathinfo($original, PATHINFO_EXTENSION));
 				$max_mb        = (float)($f['max_size'] ?? 5);
 				$max_bytes     = $max_mb * 1024 * 1024;
 
-				// Allowed extensions - default list if none configured
+				// Strict dangerous extension blacklist
+				$disallowed    = ['php', 'phtml', 'php3', 'php4', 'php5', 'php7', 'phps', 'cgi', 'pl', 'asp', 'aspx', 'jsp', 'sh', 'htaccess', 'phar'];
 				$raw_allowed   = $f['allowed_types'] ?? 'pdf,doc,docx,xls,xlsx,jpg,jpeg,png,gif,zip';
 				$allowed_exts  = array_map('trim', explode(',', strtolower($raw_allowed)));
-				$allowed_exts  = array_filter($allowed_exts); // remove empty entries
+				$allowed_exts  = array_diff(array_filter($allowed_exts), $disallowed);
 
-				if (!in_array($ext, $allowed_exts)) {
-					$errors[] = $label . ': file type .' . $ext . ' is not allowed. Allowed: ' . implode(', ', $allowed_exts);
+				if (!in_array($ext, $allowed_exts, true) || in_array($ext, $disallowed, true)) {
+					$errors[] = $label . ': file type .' . htmlspecialchars($ext) . ' is not allowed.';
 				} elseif ($_FILES[$name]['size'] > $max_bytes) {
 					$errors[] = $label . ': file exceeds maximum size of ' . $max_mb . ' MB.';
 				} else {
-					$safe = uniqid() . '_' . $original;
+					// Safe storage: append .bin so file is non-executable on any server
+					$safe = bin2hex(random_bytes(16)) . '.bin';
 					if (move_uploaded_file($_FILES[$name]['tmp_name'], $upload_dir . $safe)) {
-						// Generate a permanent token for public download
 						$token = FormBuilderPro_create_token($safe, $original, $form_id);
 						$val   = $safe . '|' . $original . '|' . $token;
 					}
@@ -300,7 +338,6 @@ function FormBuilderPro_process_submission() {
 		} elseif ($type === 'checkbox') {
 			$raw  = $_POST[$name] ?? [];
 			$raw  = is_array($raw) ? array_map('strip_tags', $raw) : [strip_tags((string)$raw)];
-			// Replace 'other' placeholder with actual text input value
 			if (in_array('other', $raw) && isset($_POST[$name . '-other'])) {
 				$raw   = array_diff($raw, ['other']);
 				$other = strip_tags(trim($_POST[$name . '-other']));
@@ -309,7 +346,6 @@ function FormBuilderPro_process_submission() {
 			$val = implode(', ', $raw);
 		} elseif ($type === 'radio') {
 			$val = strip_tags(trim($_POST[$name] ?? ''));
-			// Replace 'other' placeholder with actual text input value
 			if ($val === 'other' && isset($_POST[$name . '-other'])) {
 				$val = strip_tags(trim($_POST[$name . '-other']));
 			}
@@ -324,11 +360,10 @@ function FormBuilderPro_process_submission() {
 	}
 
 	if (!empty($errors)) {
-		// Store errors + old values in session for repopulation
-		if (session_status() === PHP_SESSION_NONE) session_start();
+		if (session_status() === PHP_SESSION_NONE) @session_start();
 		$_SESSION['fb_errors_' . $form_id] = $errors;
 		$_SESSION['fb_old_'	. $form_id] = $_POST;
-		session_write_close();
+		@session_write_close();
 		FormBuilderPro_redirect_result($form_id, 'err');
 		return;
 	}
@@ -342,7 +377,6 @@ function FormBuilderPro_process_submission() {
 	$stmt->execute();
 	$submission_id = $db->lastInsertRowID();
 
-	// Backfill submission_id onto any tokens created during this submission
 	foreach ($data as $val) {
 		$parts = explode('|', $val);
 		if (count($parts) === 3) {
@@ -355,9 +389,7 @@ function FormBuilderPro_process_submission() {
 
 	try {
 		FormBuilderPro_send_email($form, $settings, $data, $fields);
-	} catch (\Throwable $e) {
-		// Silently continue - submission is saved
-	}
+	} catch (\Throwable $e) {}
 
 	FormBuilderPro_redirect_result($form_id, 'ok');
 }
@@ -511,11 +543,10 @@ function FormBuilderPro_send_email($form, $settings, $data, $fields = []) {
 	$subject = !empty($settings['email_subject']) ? $settings['email_subject'] : 'New submission: ' . $form['name'];
 	$body    = '';
 
-	// Build email body - replace file values with human-readable lines + download links
+	// Build email body
 	foreach ($data as $k => $v) {
 		$parts = explode('|', $v);
 		if (count($parts) === 3) {
-			// File: safe|original|token
 			$url   = FormBuilderPro_download_url($parts[2]);
 			$body .= "$k: " . $parts[1] . "\n";
 			$body .= "$k download link: " . $url . "\n";
@@ -549,7 +580,7 @@ function FormBuilderPro_send_email($form, $settings, $data, $fields = []) {
 		foreach ($data as $v) {
 			$parts = explode('|', $v);
 			if (count($parts) === 3) {
-				$path = GSDATAOTHERPATH . 'fbp_uploads/' . $parts[0];
+				$path = FormBuilderPro_UPLOAD_DIR . $parts[0];
 				if (file_exists($path)) {
 					$attachments[] = ['path' => $path, 'name' => $parts[1]];
 				}
@@ -567,8 +598,7 @@ function FormBuilderPro_find_reply_to($form, $data) {
 		$type    = $f['type']    ?? '';
 		$subtype = $f['subtype'] ?? '';
 		$is_email = ($type === 'email')
-			|| ($type === 'text' && $subtype === 'email')
-			|| ($type === 'radio-group' && false); // not applicable
+			|| ($type === 'text' && $subtype === 'email');
 		if ($is_email && !empty($f['reply_to'])) {
 			$label = $f['label'] ?? $f['name'] ?? '';
 			$val   = $data[$label] ?? '';
@@ -591,7 +621,6 @@ function FormBuilderPro_from_address($settings) {
 }
 
 function FormBuilderPro_mailer($settings, $to, $subject, $body, $from_name = 'formBuilder', $reply_to = null, $attachments = []) {
-	// Guard: if no recipient, log and return - don't crash
 	if (empty(trim($to ?? ''))) {
 		return ['ok' => false, 'msg' => 'No recipient address configured.'];
 	}
@@ -623,14 +652,12 @@ function FormBuilderPro_mailer($settings, $to, $subject, $body, $from_name = 'fo
 			}
 
 			$mail->SMTPAuth = !empty($mail->Username);
-			$from = !empty($settings['smtp_from']) ? $settings['smtp_from']
-					: FormBuilderPro_from_address($settings);
+			$from = !empty($settings['smtp_from']) ? $settings['smtp_from'] : FormBuilderPro_from_address($settings);
 		} else {
 			$mail->isMail();
 			$from = get_setting('email') ?: ('noreply@' . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
 		}
 
-		// Final guard: setFrom will throw on an empty address
 		if (empty(trim($from))) {
 			$from = 'noreply@' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
 		}
@@ -649,14 +676,13 @@ function FormBuilderPro_mailer($settings, $to, $subject, $body, $from_name = 'fo
 		return ['ok' => true];
 
 	} catch (\Throwable $e) {
-		// Catches PHPMailer\Exception, Error (class not found, etc.), and anything else
 		$msg = isset($mail) ? $mail->ErrorInfo : $e->getMessage();
 		return ['ok' => false, 'msg' => $msg];
 	}
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SHORTCODE  →  (formbuilderpro id="1")  or  (formbuilderpro slug="contact")
+// SHORTCODE & TEMPLATE
 // ─────────────────────────────────────────────────────────────────────────────
 
 add_filter('content', 'FormBuilderPro_shortcode_filter');
@@ -680,7 +706,6 @@ function FormBuilderPro_shortcode_filter($content) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TEMPLATE TAG
-// Usage in theme:  get_FormBuilderPro(1)  or  get_FormBuilderPro('contact')
 // ─────────────────────────────────────────────────────────────────────────────
 
 function get_FormBuilderPro($id_or_slug) {
@@ -703,7 +728,6 @@ function FormBuilderPro_render($form_id) {
 	$fields   = json_decode($form['fields'],   true) ?: [];
 	$settings = json_decode($form['settings'], true) ?: [];
 
-	// Result comes via URL param after PRG redirect
 	$url_form   = (int)($_GET['fb_form']   ?? 0);
 	$url_status = $_GET['fb_status'] ?? '';
 	$is_our_form = ($url_form === (int)$form_id);
@@ -717,8 +741,7 @@ function FormBuilderPro_render($form_id) {
 			? $settings['success_msg']
 			: 'Thank you! Your message has been sent.';
 	} elseif ($is_our_form && $url_status === 'err') {
-		// Errors and old values still use session (needed for field repopulation)
-		if (session_status() === PHP_SESSION_NONE) session_start();
+		if (session_status() === PHP_SESSION_NONE) @session_start();
 		$errors = $_SESSION['fb_errors_' . $form_id] ?? [];
 		$old	= $_SESSION['fb_old_'	. $form_id] ?? [];
 		unset($_SESSION['fb_errors_' . $form_id], $_SESSION['fb_old_' . $form_id]);
@@ -767,12 +790,9 @@ function FormBuilderPro_render($form_id) {
 				<span class="fb-help-tip">' . htmlspecialchars($desc) . '</span>
 			</span>' : '';
 
-		// Normalise library type names to our renderer's type names
 		if ($type === 'radio-group')    $type = 'radio';
 		if ($type === 'checkbox-group') $type = 'checkbox';
 
-		// Library stores options as 'values' array of {label,value} objects
-		// Fall back to legacy 'options' array (plain strings) for older stored data
 		$options = [];
 		if (!empty($f['values']) && is_array($f['values'])) {
 			foreach ($f['values'] as $v) {
@@ -784,7 +804,6 @@ function FormBuilderPro_render($form_id) {
 			}
 		}
 
-		// For text fields with a subtype, use the subtype as the input type
 		$input_type = $type;
 		if ($type === 'text' && in_array($subtype, ['email','tel','number','password'])) {
 			$input_type = $subtype;
@@ -958,19 +977,10 @@ document.addEventListener('DOMContentLoaded', function () {
 .fb-options-block{display:flex;flex-direction:column;gap:.4rem}
 .fb-options-inline{display:flex;flex-wrap:wrap;gap:.4rem .75rem}
 .fb-options-inline .fb-inline,.fb-options-inline .fb-other-wrap{margin-right:0}
-/* Toggle switch */
 .fb-toggle-wrap{display:inline-flex;align-items:center;gap:.6rem;cursor:pointer;margin-bottom:.35rem}
 .fb-toggle-input{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
-.fb-toggle-slider{
-    position:relative;display:inline-block;width:36px;height:20px;flex-shrink:0;
-    background:#d0d5dd;border-radius:20px;transition:background .2s;
-}
-.fb-toggle-slider::after{
-    content:'';position:absolute;top:3px;left:3px;
-    width:14px;height:14px;border-radius:50%;
-    background:#fff;transition:transform .2s;
-    box-shadow:0 1px 3px rgba(0,0,0,.2);
-}
+.fb-toggle-slider{position:relative;display:inline-block;width:36px;height:20px;flex-shrink:0;background:#d0d5dd;border-radius:20px;transition:background .2s}
+.fb-toggle-slider::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .fb-toggle-input:checked + .fb-toggle-slider{background:#2764e7}
 .fb-toggle-input:checked + .fb-toggle-slider::after{transform:translateX(16px)}
 .fb-toggle-label{font-weight:400;font-size:.9375rem;color:#1a1a2e}
@@ -985,17 +995,8 @@ document.addEventListener('DOMContentLoaded', function () {
 .fb-help-wrap{position:relative;display:inline-flex;align-items:center;margin-left:.3rem;vertical-align:middle}
 .fb-help-icon{color:#9ca3af;cursor:pointer;flex-shrink:0;transition:color .15s}
 .fb-help-wrap:hover .fb-help-icon{color:#2764e7}
-.fb-help-tip{
-    display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
-    background:#1a1a2e;color:#fff;font-size:.78rem;font-weight:400;line-height:1.4;
-    padding:.4rem .6rem;border-radius:5px;white-space:normal;width:220px;
-    text-transform:none;letter-spacing:0;
-    box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:100;pointer-events:none;
-}
-.fb-help-tip::after{
-    content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);
-    border:5px solid transparent;border-top-color:#1a1a2e;
-}
+.fb-help-tip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;font-size:.78rem;font-weight:400;line-height:1.4;padding:.4rem .6rem;border-radius:5px;white-space:normal;width:220px;text-transform:none;letter-spacing:0;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:100;pointer-events:none}
+.fb-help-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1a1a2e}
 .fb-help-wrap:hover .fb-help-tip{display:block}
 .fb-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none}
 .fb-errors{background:#fef2f2;border:1px solid #fca5a5;border-radius:5px;padding:.75rem 1rem;margin-bottom:1rem;color:#b91c1c;font-size:.875rem}
@@ -1007,14 +1008,12 @@ document.addEventListener('DOMContentLoaded', function () {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ADMIN PAGE  (entry point called by GS - routes to sub-pages)
+// ADMIN PAGE
 // ─────────────────────────────────────────────────────────────────────────────
 
 function FormBuilderPro_admin_page() {
 	global $USR, $USRLANG, $LANG;
 
-	// Resolve current user's canvas language
-	// Priority: per-user XML → $USRLANG global → $LANG global → en-US
 	$fb_locale = 'en-US';
 	if (!empty($USRLANG)) {
 		$fb_locale = str_replace('_', '-', $USRLANG);
@@ -1040,11 +1039,23 @@ function FormBuilderPro_admin_page() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ADMIN AJAX ENDPOINTS  (only reached from FormBuilderPro_admin_page())
+// ADMIN AJAX ENDPOINTS
 // ─────────────────────────────────────────────────────────────────────────────
 
 function FormBuilderPro_handle_ajax($action) {
-	header('Content-Type: application/json');
+	header('Content-Type: application/json; charset=utf-8');
+
+	// Require backend authentication for all actions except localized string lookups
+	if ($action !== 'get_lang') {
+		FormBuilderPro_check_auth_or_die();
+	}
+
+	$post_actions = ['save_form', 'duplicate_form', 'delete_form', 'test_email', 'delete_file'];
+	if (in_array($action, $post_actions, true) && $_SERVER['REQUEST_METHOD'] !== 'POST') {
+		http_response_code(405);
+		echo json_encode(['ok' => false, 'msg' => 'Method Not Allowed']);
+		exit;
+	}
 
 	switch ($action) {
 
@@ -1145,35 +1156,22 @@ function FormBuilderPro_handle_ajax($action) {
 		}
 
 		case 'download_file': {
-			$safe = basename($_GET['file'] ?? '');  // basename prevents directory traversal
+			$safe = basename($_GET['file'] ?? '');
 			if (!$safe) { echo json_encode(['ok' => false]); exit; }
 
-			// Verify this filename exists in at least one submission (prevents fishing)
 			$db   = FormBuilderPro_db();
-			$stmt = $db->prepare("SELECT id FROM fbp_submissions WHERE data LIKE :pat LIMIT 1");
-			$stmt->bindValue(':pat', '%' . SQLite3::escapeString($safe) . '%', SQLITE3_TEXT);
-			$row  = $stmt->execute()->fetchArray();
+			$stmt = $db->prepare("SELECT safe_filename, original_filename FROM fbp_upload_tokens WHERE safe_filename = :safe LIMIT 1");
+			$stmt->bindValue(':safe', $safe, SQLITE3_TEXT);
+			$row  = $stmt->execute()->fetchArray(SQLITE3_ASSOC);
 			if (!$row) { http_response_code(403); exit; }
 
-			$path = GSDATAOTHERPATH . 'fbp_uploads/' . $safe;
+			$path = FormBuilderPro_UPLOAD_DIR . basename($row['safe_filename']);
 			if (!file_exists($path)) { http_response_code(404); exit; }
 
-			// Derive original filename from the stored "safename|originalname" pattern
-			// Fall back to the safe filename if the submission predates this feature
-			$original = $safe;
-			$stmt2	= $db->prepare("SELECT data FROM fbp_submissions WHERE data LIKE :pat LIMIT 1");
-			$stmt2->bindValue(':pat', '%' . SQLite3::escapeString($safe) . '%', SQLITE3_TEXT);
-			$subData  = json_decode($stmt2->execute()->fetchArray(SQLITE3_ASSOC)['data'] ?? '{}', true);
-			foreach ((array)$subData as $v) {
-				if (strpos($v, $safe . '|') === 0) {
-					$original = substr($v, strlen($safe) + 1);
-					break;
-				}
-			}
-
-			$mime = mime_content_type($path) ?: 'application/octet-stream';
+			$original = $row['original_filename'];
+			$mime = function_exists('mime_content_type') ? mime_content_type($path) : 'application/octet-stream';
 			header('Content-Type: ' . $mime);
-			header('Content-Disposition: attachment; filename="' . addslashes($original) . '"');
+			header('Content-Disposition: attachment; filename="' . rawurlencode($original) . '"');
 			header('Content-Length: ' . filesize($path));
 			header('Cache-Control: no-store');
 			readfile($path);
@@ -1199,21 +1197,7 @@ function FormBuilderPro_handle_ajax($action) {
 					'X-Mailer: Form Builder Pro',
 				]);
 				$sent = @mail($to, $subject, $body, $headers);
-
-				if ($sent) {
-					echo json_encode(['ok' => true]);
-				} else {
-					$info = [
-						'mail_disabled' => in_array('mail', array_map('trim', explode(',', ini_get('disable_functions')))),
-						'sendmail_path' => ini_get('sendmail_path'),
-						'smtp_ini'	  => ini_get('SMTP'),
-						'smtp_port_ini' => ini_get('smtp_port'),
-						'from'		  => $from,
-						'to'			=> $to,
-						'php_os'		=> PHP_OS,
-					];
-					echo json_encode(['ok' => false, 'msg' => 'mail() returned false.', 'debug' => $info]);
-				}
+				echo json_encode(['ok' => (bool)$sent]);
 			} else {
 				echo json_encode(FormBuilderPro_mailer($settings, $to, $subject, $body, 'formBuilder'));
 			}
@@ -1231,7 +1215,7 @@ function FormBuilderPro_handle_ajax($action) {
 			");
 			$rows = [];
 			while ($r = $res->fetchArray(SQLITE3_ASSOC)) {
-				$path        = GSDATAOTHERPATH . 'fbp_uploads/' . $r['safe_filename'];
+				$path        = FormBuilderPro_UPLOAD_DIR . $r['safe_filename'];
 				$r['exists'] = file_exists($path);
 				$r['size']   = $r['exists'] ? filesize($path) : 0;
 				$rows[]      = $r;
@@ -1248,10 +1232,10 @@ function FormBuilderPro_handle_ajax($action) {
 			$stmt->bindValue(':t', $token, SQLITE3_TEXT);
 			$row  = $stmt->execute()->fetchArray(SQLITE3_ASSOC);
 			if (!$row) { echo json_encode(['ok' => false, 'msg' => 'Not found']); exit; }
-			// Delete physical file
-			$path = GSDATAOTHERPATH . 'fbp_uploads/' . $row['safe_filename'];
+
+			$path = FormBuilderPro_UPLOAD_DIR . basename($row['safe_filename']);
 			if (file_exists($path)) @unlink($path);
-			// Delete token record
+
 			$del = $db->prepare("DELETE FROM fbp_upload_tokens WHERE token = :t");
 			$del->bindValue(':t', $token, SQLITE3_TEXT);
 			$del->execute();
@@ -1261,7 +1245,6 @@ function FormBuilderPro_handle_ajax($action) {
 
 		case 'get_lang': {
 			$locale = preg_replace('/[^a-zA-Z\-]/', '', $_GET['locale'] ?? 'en-US');
-			// English is built into the library - no file needed
 			if (!$locale || $locale === 'en-US' || $locale === 'en') {
 				header('Content-Type: application/json; charset=UTF-8');
 				echo json_encode([]);
@@ -1289,6 +1272,7 @@ function FormBuilderPro_handle_ajax($action) {
 		}
 
 		default:
+			http_response_code(400);
 			echo json_encode(['ok' => false, 'msg' => 'Unknown action']);
 			exit;
 	}

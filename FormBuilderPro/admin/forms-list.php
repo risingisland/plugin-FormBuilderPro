@@ -5,9 +5,9 @@
  * Included by FormBuilderPro_admin_page() when fb_view is 'list' (default).
  */
 
-$forms = FormBuilderPro_get_forms();
+$forms = FormBuilderPro_get_forms();$fb_nonce = FormBuilderPro_get_token_nonce();
 ?>
-<div id="fb-app">
+<div id="fb-app" data-nonce="<?= htmlspecialchars($fb_nonce) ?>">
 
 <link rel="stylesheet" href="<?= FormBuilderPro_PLUGIN_URL ?>assets/css/style.css">
 <script>
@@ -41,13 +41,13 @@ const FB_DOWNLOAD_BASE = '<?= $SITEURL ?>plugins/FormBuilderPro/public/download.
 
 <!-- ── View tabs ─────────────────────────────────────────────────────── -->
 <div class="fb-tabs" style="margin-bottom:1rem">
-    <div class="fb-tab active" data-view="forms"  onclick="fbListView('forms')" >
+	<div class="fb-tab active" data-view="forms"  onclick="fbListView('forms')" >
 		<svg style="vertical-align:middle" width="1.4em" height="1.4em" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M11 15h6v2h-6zM9 7H7v2h2zm2 6h6v-2h-6zm0-4h6V7h-6zm-2 2H7v2h2zm12-6v14c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2m-2 0H5v14h14zM9 15H7v2h2z" fill="currentColor"/></svg>
 		<?= i18n_r('FormBuilderPro/lang_Tab_Forms')  ?>
 	</div>
-    <div class="fb-tab" data-view="files"  onclick="fbListView('files')" >
-	<svg xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle" width="1.4em" height="1.4em" viewBox="0 0 16 16"><path d="M0 0h16v16H0z" fill="none" /><path fill="currentColor" fill-rule="evenodd" d="M8 10.5h4A1.5 1.5 0 0 0 13.5 9V7H12a3 3 0 0 1-3-3V2.5H8A1.5 1.5 0 0 0 6.5 4v5A1.5 1.5 0 0 0 8 10.5m5.06-5.318q.145.145.243.318H12A1.5 1.5 0 0 1 10.5 4V2.697q.174.098.318.242zM15 6.242a3 3 0 0 0-.879-2.12L11.88 1.878A3 3 0 0 0 9.757 1H8a3 3 0 0 0-3 3H4a3 3 0 0 0-3 3v5a3 3 0 0 0 3 3h4a3 3 0 0 0 3-3h1a3 3 0 0 0 3-3zM9.5 12H8a3 3 0 0 1-3-3V5.5H4A1.5 1.5 0 0 0 2.5 7v5A1.5 1.5 0 0 0 4 13.5h4A1.5 1.5 0 0 0 9.5 12" clip-rule="evenodd" /></svg>
-	<?= i18n_r('FormBuilderPro/lang_Tab_Files')  ?>
+	<div class="fb-tab" data-view="files"  onclick="fbListView('files')" >
+		<svg xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle" width="1.4em" height="1.4em" viewBox="0 0 16 16"><path d="M0 0h16v16H0z" fill="none" /><path fill="currentColor" fill-rule="evenodd" d="M8 10.5h4A1.5 1.5 0 0 0 13.5 9V7H12a3 3 0 0 1-3-3V2.5H8A1.5 1.5 0 0 0 6.5 4v5A1.5 1.5 0 0 0 8 10.5m5.06-5.318q.145.145.243.318H12A1.5 1.5 0 0 1 10.5 4V2.697q.174.098.318.242zM15 6.242a3 3 0 0 0-.879-2.12L11.88 1.878A3 3 0 0 0 9.757 1H8a3 3 0 0 0-3 3H4a3 3 0 0 0-3 3v5a3 3 0 0 0 3 3h4a3 3 0 0 0 3-3h1a3 3 0 0 0 3-3zM9.5 12H8a3 3 0 0 1-3-3V5.5H4A1.5 1.5 0 0 0 2.5 7v5A1.5 1.5 0 0 0 4 13.5h4A1.5 1.5 0 0 0 9.5 12" clip-rule="evenodd" /></svg>
+		<?= i18n_r('FormBuilderPro/lang_Tab_Files')  ?>
 	</div>
 </div>
 
@@ -77,7 +77,7 @@ const FB_DOWNLOAD_BASE = '<?= $SITEURL ?>plugins/FormBuilderPro/public/download.
         <td><?= $field_count ?></td>
         <td><?= date('d M Y', $f['created']) ?></td>
         <td style="text-align:right;white-space:nowrap">
-            <a class="btn btn-edit btn-sm" href="?id=FormBuilderPro&fb_view=edit&form_id=<?= $f['id'] ?>">
+            <a class="btn btn-edit btn-sm" href="load.php?id=FormBuilderPro&fb_view=edit&form_id=<?= $f['id'] ?>">
                 <svg width="1em" height="1em" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><g fill="currentColor"><path d="M8 7a1 1 0 0 1-1 1H6a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-1a1 1 0 0 1 2 0v1a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3h1a1 1 0 0 1 1 1"/><path d="m14.596 5.011l4.392 4.392l-6.28 6.303A1 1 0 0 1 12 16H9a1 1 0 0 1-1-1v-3a1 1 0 0 1 .294-.708zm6.496-2.103a3.097 3.097 0 0 1 .165 4.203l-.164.18l-.693.694l-4.387-4.387l.695-.69a3.1 3.1 0 0 1 4.384 0"/></g></svg>
 				<?= i18n_r('FormBuilderPro/lang_Edit') ?>
             </a>
@@ -123,10 +123,11 @@ function fbToast(msg, type) {
 
 function fbDuplicateForm(id, name) {
     if (!confirm('Duplicate "' + name + '"?')) return;
-    fetch('?id=FormBuilderPro', {
+    const nonce = document.getElementById('fb-app').dataset.nonce;
+    fetch('load.php?id=FormBuilderPro', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: 'fb_action=duplicate_form&id=' + id
+        body: 'fb_action=duplicate_form&id=' + id + '&fb_nonce=' + encodeURIComponent(nonce)
     })
     .then(r => r.json())
     .then(d => {
@@ -141,7 +142,7 @@ function fbDuplicateForm(id, name) {
                     <td>${d.fields}</td>
                     <td>${escH(d.created)}</td>
                     <td style="text-align:right;white-space:nowrap">
-                        <a class="btn btn-edit btn-sm" href="?id=FormBuilderPro&fb_view=edit&form_id=${d.id}">
+                        <a class="btn btn-edit btn-sm" href="load.php?id=FormBuilderPro&fb_view=edit&form_id=${d.id}">
                             <svg width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><g fill="currentColor"><path d="M8 7a1 1 0 0 1-1 1H6a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-1a1 1 0 0 1 2 0v1a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3h1a1 1 0 0 1 1 1"/><path d="m14.596 5.011 4.392 4.392-6.28 6.303A1 1 0 0 1 12 16H9a1 1 0 0 1-1-1v-3a1 1 0 0 1 .294-.708zm6.496-2.103a3.097 3.097 0 0 1 .165 4.203l-.164.18-.693.694-4.387-4.387.695-.69a3.1 3.1 0 0 1 4.384 0"/></g></svg>
                             Edit
                         </a>
@@ -173,10 +174,11 @@ function fbDuplicateForm(id, name) {
 
 function fbDeleteForm(id, name) {
     if (!confirm('Delete "' + name + '" and all its submissions?')) return;
-    fetch('?id=FormBuilderPro', {
+    const nonce = document.getElementById('fb-app').dataset.nonce;
+    fetch('load.php?id=FormBuilderPro', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: 'fb_action=delete_form&id=' + id
+        body: 'fb_action=delete_form&id=' + id + '&fb_nonce=' + encodeURIComponent(nonce)
     })
     .then(r => r.json())
     .then(d => {
@@ -214,7 +216,8 @@ function fbViewSubmissions(formId, formName) {
         '<p style="color:var(--text-muted);font-size:.875rem;padding:1rem">Loading…</p>';
     document.getElementById('fb-modal-bg').classList.add('open');
 
-    fetch('?id=FormBuilderPro&fb_action=get_submissions&form_id=' + formId)
+    const nonce = document.getElementById('fb-app').dataset.nonce;
+    fetch('load.php?id=FormBuilderPro&fb_action=get_submissions&form_id=' + formId + '&fb_nonce=' + encodeURIComponent(nonce))
         .then(r => r.json())
         .then(d => {
             const body = document.getElementById('fb-modal-body');
@@ -233,14 +236,13 @@ function fbViewSubmissions(formId, formName) {
                         if (parts.length === 3) {
                             const original = parts[1];
                             const token    = parts[2];
-                            const url      = FB_DOWNLOAD_BASE + token;
+                            const url      = FB_DOWNLOAD_BASE + encodeURIComponent(token);
                             display = `<a href="${url}" style="color:var(--accent);text-decoration:none;display:inline-flex;align-items:center;gap:.3rem">
                                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v7M3 5l3 3 3-3M1 9v1a1 1 0 001 1h8a1 1 0 001-1V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 ${escH(original)}</a>`;
                         } else if (parts.length === 2) {
-                            // Legacy: safe|original (no token) — use admin endpoint
-                            const url = '?id=FormBuilderPro&fb_action=download_file&file=' + encodeURIComponent(parts[0]);
-                            display = `<a href="${url}" download="${escH(parts[1])}" style="color:var(--accent);text-decoration:none">${escH(parts[1])}</a>`;
+                            const url = 'load.php?id=FormBuilderPro&fb_action=download_file&file=' + encodeURIComponent(parts[0]) + '&fb_nonce=' + encodeURIComponent(nonce);
+                            display = `<a href="${url}" style="color:var(--accent);text-decoration:none">${escH(parts[1])}</a>`;
                         } else {
                             display = escH(v);
                         }
@@ -286,7 +288,8 @@ let fbFilesLoaded = false;
 function fbLoadFiles() {
     if (fbFilesLoaded) return;
     fbFilesLoaded = true;
-    fetch('?id=FormBuilderPro&fb_action=get_files')
+    const nonce = document.getElementById('fb-app').dataset.nonce;
+    fetch('load.php?id=FormBuilderPro&fb_action=get_files&fb_nonce=' + encodeURIComponent(nonce))
         .then(r => r.json())
         .then(d => {
             const body = document.getElementById('fb-files-body');
@@ -302,7 +305,7 @@ function fbLoadFiles() {
                 <tbody>` +
                 d.rows.map(r => `<tr id="fb-file-row-${escH(r.token)}">
                     <td>
-                        <a href="${FB_DOWNLOAD_BASE}${escH(r.token)}" style="color:var(--accent)">
+                        <a href="${FB_DOWNLOAD_BASE}${encodeURIComponent(r.token)}" style="color:var(--accent)">
                             ${escH(r.original_filename)}
                         </a>
                         ${!r.exists ? '<span style="color:var(--danger);font-size:.75rem"> (missing)</span>' : ''}
@@ -327,10 +330,11 @@ function fbLoadFiles() {
 
 function fbDeleteFile(token, name) {
     if (!confirm('Delete "' + name + '"? This cannot be undone.')) return;
-    fetch('?id=FormBuilderPro', {
+    const nonce = document.getElementById('fb-app').dataset.nonce;
+    fetch('load.php?id=FormBuilderPro', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: 'fb_action=delete_file&token=' + encodeURIComponent(token)
+        body: 'fb_action=delete_file&token=' + encodeURIComponent(token) + '&fb_nonce=' + encodeURIComponent(nonce)
     })
     .then(r => r.json())
     .then(d => {
