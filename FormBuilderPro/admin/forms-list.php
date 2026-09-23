@@ -5,6 +5,7 @@
  * Included by FormBuilderPro_admin_page() when fb_view is 'list' (default).
  */
 
+global $SITEURL;
 $forms = FormBuilderPro_get_forms();$fb_nonce = FormBuilderPro_get_token_nonce();
 ?>
 <div id="fb-app" data-nonce="<?= htmlspecialchars($fb_nonce) ?>">
@@ -254,6 +255,10 @@ function fbViewSubmissions(formId, formName) {
                     <dl class="fb-sub-data">${fields}</dl>
                 </div>`;
             }).join('');
+        })
+        .catch(() => {
+            document.getElementById('fb-modal-body').innerHTML =
+                '<p style="color:var(--danger);padding:1rem">Failed to load submissions.</p>';
         });
 }
 

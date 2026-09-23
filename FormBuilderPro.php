@@ -1151,7 +1151,13 @@ function FormBuilderPro_handle_ajax($action) {
 			$res  = $stmt->execute();
 			$rows = [];
 			while ($r = $res->fetchArray(SQLITE3_ASSOC)) $rows[] = $r;
-			echo json_encode(['ok' => true, 'rows' => $rows]);
+
+			$json = json_encode(['ok' => true, 'rows' => $rows], JSON_INVALID_UTF8_SUBSTITUTE);
+			if ($json === false) {
+				http_response_code(500);
+				$json = json_encode(['ok' => false, 'msg' => 'Encoding error: ' . json_last_error_msg()]);
+			}
+			echo $json;
 			exit;
 		}
 
@@ -1220,7 +1226,13 @@ function FormBuilderPro_handle_ajax($action) {
 				$r['size']   = $r['exists'] ? filesize($path) : 0;
 				$rows[]      = $r;
 			}
-			echo json_encode(['ok' => true, 'rows' => $rows]);
+
+			$json = json_encode(['ok' => true, 'rows' => $rows], JSON_INVALID_UTF8_SUBSTITUTE);
+			if ($json === false) {
+				http_response_code(500);
+				$json = json_encode(['ok' => false, 'msg' => 'Encoding error: ' . json_last_error_msg()]);
+			}
+			echo $json;
 			exit;
 		}
 
