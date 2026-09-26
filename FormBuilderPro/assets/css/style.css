@@ -115,6 +115,7 @@
 .fb-canvas .form-group input,
 .fb-prop-group input[type=text],
 .fb-prop-group input[type=email],
+.fb-prop-group input[type=password],
 .fb-prop-group select{
 	width:100%;padding:.4rem .6rem;
 	border:1px solid var(--border);border-radius:4px;

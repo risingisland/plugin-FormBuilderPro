@@ -3,7 +3,7 @@
 /*
 Plugin Name: Form Builder Pro
 Description: Drag-n-drop form builder with mail() and SMTP. (SQLite3 required)
-Version: 1.1
+Version: 1.2
 Author: risingisland
 Author URI: https://ko-fi.com/ericmontgomery
 */
@@ -11,9 +11,9 @@ Author URI: https://ko-fi.com/ericmontgomery
 i18n_merge('FormBuilderPro') || i18n_merge('FormBuilderPro', 'en_US');
 
 // ─── Constants ───────────────────────────────────────────────────────────────
-define('FormBuilderPro_DB_PATH',     GSDATAOTHERPATH . 'FormBuilderPro.db');
-define('FormBuilderPro_SLUG',        basename(__FILE__, '.php'));
-define('FormBuilderPro_PLUGIN_DIR',  GSPLUGINPATH    . FormBuilderPro_SLUG . '/');
+define('FormBuilderPro_DB_PATH',	 GSDATAOTHERPATH . 'FormBuilderPro.db');
+define('FormBuilderPro_SLUG',		basename(__FILE__, '.php'));
+define('FormBuilderPro_PLUGIN_DIR',  GSPLUGINPATH	. FormBuilderPro_SLUG . '/');
 define('FormBuilderPro_PLUGIN_URL',  $SITEURL . 'plugins/' . FormBuilderPro_SLUG . '/');
 define('FormBuilderPro_UPLOAD_DIR',  GSDATAOTHERPATH . 'fbp_uploads/');
 
@@ -22,7 +22,7 @@ define('FormBuilderPro_UPLOAD_DIR',  GSDATAOTHERPATH . 'fbp_uploads/');
 register_plugin(
 	FormBuilderPro_SLUG,
 	'Form Builder Pro',
-	'1.1',
+	'1.2',
 	'risingisland',
 	'https://ko-fi.com/ericmontgomery',
 	'Drag-n-drop form builder with mail() and SMTP. (SQLite3 required)',
@@ -131,8 +131,8 @@ function FormBuilderPro_check_auth_or_die() {
 	if (function_exists('check_nonce') && !empty($nonce)) {
 		try {
 			$valid_nonce = check_nonce($nonce, 'fbp_admin_action', 'fbp')
-			            || check_nonce($nonce, 'fbp_admin_action')
-			            || check_nonce($nonce, 'load.php?id=' . FormBuilderPro_SLUG);
+						|| check_nonce($nonce, 'fbp_admin_action')
+						|| check_nonce($nonce, 'load.php?id=' . FormBuilderPro_SLUG);
 		} catch (\Throwable $e) {}
 	}
 
@@ -153,12 +153,12 @@ function FormBuilderPro_generate_token() {
 }
 
 function FormBuilderPro_create_token($safe, $original, $form_id, $submission_id = 0) {
-	$db    = FormBuilderPro_db();
+	$db	= FormBuilderPro_db();
 	$token = FormBuilderPro_generate_token();
 	$stmt  = $db->prepare("INSERT INTO fbp_upload_tokens (token, safe_filename, original_filename, form_id, submission_id) VALUES (:t,:s,:o,:fid,:sid)");
-	$stmt->bindValue(':t',   $token,         SQLITE3_TEXT);
-	$stmt->bindValue(':s',   $safe,          SQLITE3_TEXT);
-	$stmt->bindValue(':o',   $original,      SQLITE3_TEXT);
+	$stmt->bindValue(':t',   $token,		 SQLITE3_TEXT);
+	$stmt->bindValue(':s',   $safe,		  SQLITE3_TEXT);
+	$stmt->bindValue(':o',   $original,	  SQLITE3_TEXT);
 	$stmt->bindValue(':fid', (int)$form_id,  SQLITE3_INTEGER);
 	$stmt->bindValue(':sid', (int)$submission_id, SQLITE3_INTEGER);
 	$stmt->execute();
@@ -296,28 +296,28 @@ function FormBuilderPro_process_submission() {
 	}
 
 	foreach ($fields as $f) {
-		$name  = $f['name']    ?? '';
+		$name  = $f['name']	?? '';
 		$label = $f['label']   ?? $name;
 		$req   = !empty($f['required']);
-		$type  = $f['type']    ?? 'text';
+		$type  = $f['type']	?? 'text';
 		$val   = '';
 
 		// Normalise library type names
-		if ($type === 'radio-group')    $type = 'radio';
+		if ($type === 'radio-group')	$type = 'radio';
 		if ($type === 'checkbox-group') $type = 'checkbox';
 
 		if ($type === 'header' || $type === 'paragraph') continue;
 
 		if ($type === 'file') {
 			if (!empty($_FILES[$name]['name'])) {
-				$upload_dir    = FormBuilderPro_UPLOAD_DIR;
-				$original      = basename($_FILES[$name]['name']);
-				$ext           = strtolower(pathinfo($original, PATHINFO_EXTENSION));
-				$max_mb        = (float)($f['max_size'] ?? 5);
-				$max_bytes     = $max_mb * 1024 * 1024;
+				$upload_dir	= FormBuilderPro_UPLOAD_DIR;
+				$original	  = basename($_FILES[$name]['name']);
+				$ext		   = strtolower(pathinfo($original, PATHINFO_EXTENSION));
+				$max_mb		= (float)($f['max_size'] ?? 5);
+				$max_bytes	 = $max_mb * 1024 * 1024;
 
 				// Strict dangerous extension blacklist
-				$disallowed    = ['php', 'phtml', 'php3', 'php4', 'php5', 'php7', 'phps', 'cgi', 'pl', 'asp', 'aspx', 'jsp', 'sh', 'htaccess', 'phar'];
+				$disallowed	= ['php', 'phtml', 'php3', 'php4', 'php5', 'php7', 'phps', 'cgi', 'pl', 'asp', 'aspx', 'jsp', 'sh', 'htaccess', 'phar'];
 				$raw_allowed   = $f['allowed_types'] ?? 'pdf,doc,docx,xls,xlsx,jpg,jpeg,png,gif,zip';
 				$allowed_exts  = array_map('trim', explode(',', strtolower($raw_allowed)));
 				$allowed_exts  = array_diff(array_filter($allowed_exts), $disallowed);
@@ -371,8 +371,8 @@ function FormBuilderPro_process_submission() {
 	// Store submission
 	$db   = FormBuilderPro_db();
 	$stmt = $db->prepare("INSERT INTO fbp_submissions (form_id, data, ip) VALUES (:fid, :d, :ip)");
-	$stmt->bindValue(':fid', $form_id,                      SQLITE3_INTEGER);
-	$stmt->bindValue(':d',   json_encode($data),            SQLITE3_TEXT);
+	$stmt->bindValue(':fid', $form_id,					  SQLITE3_INTEGER);
+	$stmt->bindValue(':d',   json_encode($data),			SQLITE3_TEXT);
 	$stmt->bindValue(':ip',  $_SERVER['REMOTE_ADDR'] ?? '', SQLITE3_TEXT);
 	$stmt->execute();
 	$submission_id = $db->lastInsertRowID();
@@ -382,7 +382,7 @@ function FormBuilderPro_process_submission() {
 		if (count($parts) === 3) {
 			$upd = $db->prepare("UPDATE fbp_upload_tokens SET submission_id=:sid WHERE token=:t");
 			$upd->bindValue(':sid', (int)$submission_id, SQLITE3_INTEGER);
-			$upd->bindValue(':t',   $parts[2],           SQLITE3_TEXT);
+			$upd->bindValue(':t',   $parts[2],		   SQLITE3_TEXT);
 			$upd->execute();
 		}
 	}
@@ -539,9 +539,9 @@ function FormBuilderPro_verify_recaptcha3($secret, $token, $threshold = 0.5) {
 }
 
 function FormBuilderPro_send_email($form, $settings, $data, $fields = []) {
-	$to      = !empty($settings['email_to']) ? $settings['email_to'] : get_setting('email');
+	$to	  = !empty($settings['email_to']) ? $settings['email_to'] : get_setting('email');
 	$subject = !empty($settings['email_subject']) ? $settings['email_subject'] : 'New submission: ' . $form['name'];
-	$body    = '';
+	$body	= '';
 
 	// Build email body
 	foreach ($data as $k => $v) {
@@ -560,7 +560,7 @@ function FormBuilderPro_send_email($form, $settings, $data, $fields = []) {
 
 	if (!$use_smtp) {
 		if (empty($to)) return ['ok' => false, 'msg' => 'No recipient address configured.'];
-		$from         = FormBuilderPro_from_address($settings);
+		$from		 = FormBuilderPro_from_address($settings);
 		$header_lines = [
 			'From: ' . $form['name'] . ' <' . $from . '>',
 			'Content-Type: text/plain; charset=UTF-8',
@@ -568,7 +568,7 @@ function FormBuilderPro_send_email($form, $settings, $data, $fields = []) {
 		];
 		if ($reply_to) $header_lines[] = 'Reply-To: ' . $reply_to;
 		$headers = implode("\r\n", $header_lines);
-		$sent    = @mail($to, $subject, $body, $headers);
+		$sent	= @mail($to, $subject, $body, $headers);
 		return $sent
 			? ['ok' => true]
 			: ['ok' => false, 'msg' => 'mail() returned false. Check your server mail configuration.'];
@@ -595,7 +595,7 @@ function FormBuilderPro_send_email($form, $settings, $data, $fields = []) {
 function FormBuilderPro_find_reply_to($form, $data) {
 	$fields = json_decode($form['fields'], true) ?: [];
 	foreach ($fields as $f) {
-		$type    = $f['type']    ?? '';
+		$type	= $f['type']	?? '';
 		$subtype = $f['subtype'] ?? '';
 		$is_email = ($type === 'email')
 			|| ($type === 'text' && $subtype === 'email');
@@ -773,24 +773,24 @@ function FormBuilderPro_render($form_id) {
 	<input type="hidden" name="_fb_ts" value="<?= time() ?>">
 	<?php endif ?>
 	<?php foreach ($fields as $f):
-		$type     = $f['type']    ?? 'text';
+		$type	 = $f['type']	?? 'text';
 		$subtype  = $f['subtype'] ?? '';
-		$name     = htmlspecialchars($f['name']  ?? '');
+		$name	 = htmlspecialchars($f['name']  ?? '');
 		$raw_label = $f['label'] ?? ($f['name'] ?? '');
-		$label    = htmlspecialchars($raw_label);
-		$req      = !empty($f['required']);
-		$ph       = htmlspecialchars($f['placeholder'] ?? '');
-		$val      = htmlspecialchars($old[$name] ?? '');
-		$req_a    = $req ? ' required' : '';
-		$req_s    = $req ? ' <span class="fb-req">*</span>' : '';
-		$desc     = $f['description'] ?? '';
+		$label	= htmlspecialchars($raw_label);
+		$req	  = !empty($f['required']);
+		$ph	   = htmlspecialchars($f['placeholder'] ?? '');
+		$val	  = htmlspecialchars($old[$name] ?? '');
+		$req_a	= $req ? ' required' : '';
+		$req_s	= $req ? ' <span class="fb-req">*</span>' : '';
+		$desc	 = $f['description'] ?? '';
 		$help_icon = $desc ? '
 			<span class="fb-help-wrap">
 				<svg class="fb-help-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
 				<span class="fb-help-tip">' . htmlspecialchars($desc) . '</span>
 			</span>' : '';
 
-		if ($type === 'radio-group')    $type = 'radio';
+		if ($type === 'radio-group')	$type = 'radio';
 		if ($type === 'checkbox-group') $type = 'checkbox';
 
 		$options = [];
@@ -830,9 +830,9 @@ function FormBuilderPro_render($form_id) {
 				<?php endforeach ?>
 			</select>
 		<?php elseif ($type === 'radio'):
-			$has_other     = !empty($f['other']);
-			$is_inline     = !empty($f['inline']);
-			$other_val     = ($val === 'other') ? htmlspecialchars($old[$name . '-other'] ?? '') : '';
+			$has_other	 = !empty($f['other']);
+			$is_inline	 = !empty($f['inline']);
+			$other_val	 = ($val === 'other') ? htmlspecialchars($old[$name . '-other'] ?? '') : '';
 			$other_checked = ($val === 'other') ? ' checked' : '';
 		?>
 			<div class="<?= $is_inline ? 'fb-options-inline' : 'fb-options-block' ?>">
@@ -852,12 +852,12 @@ function FormBuilderPro_render($form_id) {
 			<?php endif ?>
 			</div>
 		<?php elseif ($type === 'checkbox'):
-			$has_other     = !empty($f['other']);
-			$is_inline     = !empty($f['inline']);
-			$is_toggle     = !empty($f['toggle']);
+			$has_other	 = !empty($f['other']);
+			$is_inline	 = !empty($f['inline']);
+			$is_toggle	 = !empty($f['toggle']);
 			$checked_vals  = $val ? explode(', ', $val) : [];
 			$other_checked = in_array('other', $checked_vals);
-			$other_val     = $other_checked ? htmlspecialchars($old[$name . '-other'] ?? '') : '';
+			$other_val	 = $other_checked ? htmlspecialchars($old[$name . '-other'] ?? '') : '';
 		?>
 			<div class="<?= $is_inline ? 'fb-options-inline' : 'fb-options-block' ?>">
 			<?php foreach ($options as $opt):
@@ -919,21 +919,21 @@ function FormBuilderPro_render($form_id) {
 <script>
 // Enable/disable "Other" text input when radio selection changes
 document.querySelectorAll('.fb-form input[type=radio]').forEach(function(r) {
-    r.addEventListener('change', function() {
-        var wrap = this.closest('form');
-        if (!wrap) return;
-        var name = this.name;
-        var otherInput = wrap.querySelector('input[name="' + name + '-other"]');
-        if (!otherInput) return;
-        otherInput.disabled = (this.value !== 'other');
-    });
+	r.addEventListener('change', function() {
+		var wrap = this.closest('form');
+		if (!wrap) return;
+		var name = this.name;
+		var otherInput = wrap.querySelector('input[name="' + name + '-other"]');
+		if (!otherInput) return;
+		otherInput.disabled = (this.value !== 'other');
+	});
 });
 // Enable/disable "Other" text input when checkbox changes
 document.querySelectorAll('.fb-form input[type=checkbox][value=other]').forEach(function(cb) {
-    cb.addEventListener('change', function() {
-        var otherInput = this.closest('label').querySelector('.fb-other-input');
-        if (otherInput) otherInput.disabled = !this.checked;
-    });
+	cb.addEventListener('change', function() {
+		var otherInput = this.closest('label').querySelector('.fb-other-input');
+		if (otherInput) otherInput.disabled = !this.checked;
+	});
 });
 </script>
 <?php if (($settings['captcha_method'] ?? '') === 'turnstile' && !empty($settings['turnstile_site_key'])): ?>
@@ -1103,18 +1103,18 @@ function FormBuilderPro_handle_ajax($action) {
 
 			$db   = FormBuilderPro_db();
 			$stmt = $db->prepare("INSERT INTO fbp_forms (name, slug, fields, settings) VALUES (:n, :s, :f, :st)");
-			$stmt->bindValue(':n',  $new_name,       SQLITE3_TEXT);
-			$stmt->bindValue(':s',  $new_slug,        SQLITE3_TEXT);
+			$stmt->bindValue(':n',  $new_name,	   SQLITE3_TEXT);
+			$stmt->bindValue(':s',  $new_slug,		SQLITE3_TEXT);
 			$stmt->bindValue(':f',  $form['fields'],  SQLITE3_TEXT);
 			$stmt->bindValue(':st', $form['settings'], SQLITE3_TEXT);
 			$stmt->execute();
 			$new_id = $db->lastInsertRowID();
 
 			echo json_encode([
-				'ok'      => true,
-				'id'      => $new_id,
-				'name'    => $new_name,
-				'slug'    => $new_slug,
+				'ok'	  => true,
+				'id'	  => $new_id,
+				'name'	=> $new_name,
+				'slug'	=> $new_slug,
 				'fields'  => count(json_decode($form['fields'], true) ?: []),
 				'created' => date('d M Y'),
 			]);
@@ -1221,10 +1221,10 @@ function FormBuilderPro_handle_ajax($action) {
 			");
 			$rows = [];
 			while ($r = $res->fetchArray(SQLITE3_ASSOC)) {
-				$path        = FormBuilderPro_UPLOAD_DIR . $r['safe_filename'];
+				$path		= FormBuilderPro_UPLOAD_DIR . $r['safe_filename'];
 				$r['exists'] = file_exists($path);
 				$r['size']   = $r['exists'] ? filesize($path) : 0;
-				$rows[]      = $r;
+				$rows[]	  = $r;
 			}
 
 			$json = json_encode(['ok' => true, 'rows' => $rows], JSON_INVALID_UTF8_SUBSTITUTE);
