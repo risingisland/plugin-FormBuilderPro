@@ -296,3 +296,6 @@ div.formbuilder-header.form-group h1,h2,h3,h4,h5,h6{color:#1a1a2e;!important;fon
 .form-wrap.form-builder .frmb .add-opt:hover {
 	background:#eef3fd;
 }
+
+footer{text-align:center; margin-top: 20px;}
+footer a.donate{text-decoration:none !important;}
