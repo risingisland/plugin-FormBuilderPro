@@ -297,5 +297,5 @@ div.formbuilder-header.form-group h1,h2,h3,h4,h5,h6{color:#1a1a2e;!important;fon
 	background:#eef3fd;
 }
 
-footer{text-align:center; margin-top: 20px;}
+footer{text-align:center; margin-top: 20px;font-size:.9em;color:grey;}
 footer a.donate{text-decoration:none !important;}
